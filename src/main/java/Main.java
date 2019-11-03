@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +39,17 @@ public class Main {
         List<JSONObject> keyList = jsonList
                 .stream()
                 .filter(a -> a.get("title").toString().contains(key))
+                .sorted(Comparator.comparing(a ->(Integer)a.get("n_citations")))
                 .collect(Collectors.toList());
+
+        List<String> refList = keyList
+                .stream()
+                .map(a -> a.get("id").toString())
+                .collect(Collectors.toList());
+
+        for(String str: refList) {
+            refList.stream().forEach(System.out::println);
+        }
 
 
 
