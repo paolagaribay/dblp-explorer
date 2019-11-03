@@ -1,15 +1,14 @@
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.JsonFactory;
+
+import org.json.simple.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 
 public class Main {
@@ -19,58 +18,31 @@ public class Main {
             System.exit(1);
         }
         long start = System.currentTimeMillis();
-
-        File f = new File(args[0]);
         String key = args[1];
         int n = Integer.parseInt(args[2]);
+        JSONParser parser = new JSONParser();
+        List<JSONObject> jsonList;
 
-        List<Article> jsonList = new ArrayList<>();
-        List<Article> keyTitles = new ArrayList<>();
-        List<Article> refList = new ArrayList<>();
+        Stream<String>lines = Files.lines(Paths.get(args[0]), Charset.defaultCharset());
+        jsonList = lines
+                .map(line-> {
+                    try {
+                        return (JSONObject)parser.parse(line);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .collect(Collectors.toList());
 
-        JsonFactory jf = new JsonFactory();
-        JsonParser parser = jf.createJsonParser(f);
-        JsonToken token = parser.nextToken();
-
-        while (token != JsonToken.END_ARRAY) {
-            String name = parser.getCurrentName();
-            Article a = new Article();
-            if ("id".equals(name)) {
-                token = parser.nextToken();
-                a.setId(parser.getText());
-            }
-            if ("title".equals(name)) {
-                token = parser.nextToken();
-                a.setTitle(parser.getText());
-            }
-            if ("n_citations".equals(name)) {
-                token = parser.nextToken();
-                a.setCitations(Integer.parseInt(parser.getText()));
-            }
-            if ("references".equals(name)) {
-                token = parser.nextToken();
-                List<String> ref = new ArrayList<>();
-                while (parser.nextToken() != JsonToken.END_ARRAY) {
-                    ref.add(parser.getText());
-                }
-                a.setReferences(ref);
-            }
-            if (token == JsonToken.END_OBJECT) {
-                jsonList.add(a);
-            }
-            token = parser.nextToken();
-        }
-        // check for keyword - add to list
-        try (Stream<String>lines = Files.lines(Paths.get(args[0]), Charset.defaultCharset())) {
+        List<JSONObject> keyList = jsonList
+                .stream()
+                .filter(a -> a.get("title").toString().contains(key))
+                .collect(Collectors.toList());
 
 
-        } catch (IOException e) {
 
-        }
-        // get ref articles - add to list
-        for (int i = 0; i < refList.size(); i++) { // sort by ncitations
-            refList.get(i).printArticle();
-        }
+
         // process json file
         // search for keyword
         // get cited articles till level n
