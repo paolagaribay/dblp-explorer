@@ -24,8 +24,9 @@ public class Main {
         String key = args[1];
         int n = Integer.parseInt(args[2]);
 
-        List<Article> json = new ArrayList<>();
-        List<String> keyTitles = new ArrayList<>();
+        List<Article> jsonList = new ArrayList<>();
+        List<Article> keyTitles = new ArrayList<>();
+        List<Article> refList = new ArrayList<>();
 
         JsonFactory jf = new JsonFactory();
         JsonParser parser = jf.createJsonParser(f);
@@ -55,18 +56,21 @@ public class Main {
                 a.setReferences(ref);
             }
             if (token == JsonToken.END_OBJECT) {
-                json.add(a);
+                jsonList.add(a);
             }
             token = parser.nextToken();
         }
-
+        // check for keyword - add to list
         try (Stream<String>lines = Files.lines(Paths.get(args[0]), Charset.defaultCharset())) {
 
 
         } catch (IOException e) {
 
         }
-
+        // get ref articles - add to list
+        for (int i = 0; i < refList.size(); i++) { // sort by ncitations
+            refList.get(i).printArticle();
+        }
         // process json file
         // search for keyword
         // get cited articles till level n
