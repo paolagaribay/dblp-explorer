@@ -1,9 +1,7 @@
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,8 +23,8 @@ public class Main {
         int n = Integer.parseInt(args[2]);
 
         List<Article> jsonList = new ArrayList<>();
-        List<Article> keyTitles = new ArrayList<>();
-        List<Article> refList = new ArrayList<>();
+        List<Article> keyTitles;
+        List<String> refList = new ArrayList<>();
 
         JsonFactory jf = new JsonFactory();
         JsonParser parser = jf.createJsonParser(f);
@@ -60,12 +58,15 @@ public class Main {
             }
             token = parser.nextToken();
         }
-        //for (Article a: jsonList) {
-          //  String t = a.getTitle();
-            //i
-        //}
-        //keyTitles = jsonList.stream().filter(a ->return args.equals()a.getTitle())
-        // check for keyword - add to list
+        keyTitles = jsonList
+                .stream()
+                .filter(a -> a.getTitle().contains(key))
+                .sorted(Comparator.comparing(Article::getCitations))
+                .collect(Collectors.toList());
+
+        for (Article a: keyTitles) {
+            refList.addAll(a.getReferences());
+        }
 
         // get ref articles - add to list
        // for (int i = 0; i < refList.size(); i++) { // sort by ncitations
