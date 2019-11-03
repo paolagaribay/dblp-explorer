@@ -1,6 +1,10 @@
+import java.util.List;
+
 public class Article {
     String title;
-    int id;
+    String id;
+    int citations;
+    List<String> references;
 
     public void setTitle(String title) {
         this.title = title;
@@ -10,13 +14,30 @@ public class Article {
         return title;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
+
+    public void setCitations(int citations) {
+        this.citations = citations;
+    }
+
+    public int getCitations() {
+        return citations;
+    }
+
+    public void setReferences(List<String> references) {
+        this.references = references;
+    }
+
+    public List<String> getReferences() {
+        return references;
+    }
+
     public void printArticle() {
         System.out.println(title);
     }
