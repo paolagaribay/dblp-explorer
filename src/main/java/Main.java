@@ -68,10 +68,8 @@ public class Main {
             refList.addAll(a.getReferences());
         }
 
-        // get ref articles - add to list
-       // for (int i = 0; i < refList.size(); i++) { // sort by ncitations
-         //   refList.get(i).printArticle();
-        //}
+        keyTitles.forEach(System.out::println);
+
         // process json file
         // search for keyword
         // get cited articles till level n
