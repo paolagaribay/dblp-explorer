@@ -67,7 +67,7 @@ public class Main {
         for (Article a: keyTitles) {
             refList.addAll(a.getReferences());
         }
-
+        keyTitles.stream().distinct().collect(Collectors.toList());
         keyTitles.forEach(System.out::println);
 
         // process json file
