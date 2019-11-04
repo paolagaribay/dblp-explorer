@@ -2,7 +2,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,14 +22,14 @@ public class Main {
             System.exit(1);
         }*/
         long start = System.currentTimeMillis();
-
-        String key = "system";//args[1];
-        int n = 1;//Integer.parseInt(args[2]);
+        String path = "C:\\Users\\Paola\\Documents\\COSC\\COSC 4353\\a5\\src\\main\\java\\test.txt";//args[0]
+        String key = "system";//args[1]
+        int n = 1;//Integer.parseInt(args[2])
         JSONParser parser = new JSONParser();
         List<JSONObject> jsonList;
         List<String> refList = new ArrayList<>();
-       // HashMap<String, List<String>> h = new HashMap<>();
-        Stream<String>lines = Files.lines(Paths.get("C:\\Users\\Paola\\Documents\\COSC\\COSC 4353\\a5\\src\\main\\java\\test.txt"), Charset.defaultCharset());
+        HashMap<String, JSONArray> h = new HashMap<>();
+        Stream<String>lines = Files.lines(Paths.get(path), Charset.defaultCharset());
         jsonList = lines
                 .map(a-> {
                     try {
@@ -43,19 +45,19 @@ public class Main {
                 .stream()
                 .filter(a -> a.get("title").toString().toLowerCase().contains(key.toLowerCase()))
                 .collect(Collectors.toList());
-        System.out.println("Printing titles with keyword: "+key);
+        System.out.println("Printing titles with keyword "+key+": ");
         keyList.forEach(a->System.out.println(a.get("title").toString()));
-        System.out.println("");
 
         keyList.stream().filter(a->a.get("references")!=null).forEach(a-> getRef(a, refList));
+        //refList.stream().distinct().forEach(a->setHash(a, ));
 
         if(n==1) {
-            System.out.println("Article ids for level 1: ");
+            System.out.println("\n"+"Article ids for level 1: ");
             refList.stream().distinct().forEach(System.out::println);
         }
 
         long stop = System.currentTimeMillis();
-        System.out.println("Total time taken in ms: " + (stop-start));
+        System.out.println("\n"+"Total time taken in ms: " + (stop-start));
         Runtime r = Runtime.getRuntime();
         r.gc();
         long memory = r.totalMemory()-r.freeMemory();
