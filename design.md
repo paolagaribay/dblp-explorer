@@ -1,1 +1,2 @@
 
+I tried to use JSON simple to parse through the JSON objects in the file. Then, I added each JSON object to a list using a stream. I also used stream when filtering for the keyword. For the references, I went through each filtered JSON object and got their reference ids. Then, I looked through the main JSON list to find each id's object and adding it to the reference list. Finally, for all the levels I displayed each article's title and id sorted from the most cited to least cited.
