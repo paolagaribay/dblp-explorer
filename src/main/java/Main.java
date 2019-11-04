@@ -1,9 +1,10 @@
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,17 +16,19 @@ import org.json.simple.parser.ParseException;
 
 public class Main {
     public static void main(String [] args) throws IOException {
-        if (args.length < 3) {
+        /*if (args.length < 3) {
             System.out.println("Error, usage: java Main.java jsonFile keyword int");
             System.exit(1);
-        }
+        }*/
         long start = System.currentTimeMillis();
-        String key = args[1];
-        int n = Integer.parseInt(args[2]);
+
+        String key = "system";//args[1];
+        int n = 1;//Integer.parseInt(args[2]);
         JSONParser parser = new JSONParser();
         List<JSONObject> jsonList;
-
-        Stream<String>lines = Files.lines(Paths.get(args[0]), Charset.defaultCharset());
+        List<String> refList = new ArrayList<>();
+       // HashMap<String, List<String>> h = new HashMap<>();
+        Stream<String>lines = Files.lines(Paths.get("C:\\Users\\Paola\\Documents\\COSC\\COSC 4353\\a5\\src\\main\\java\\test.txt"), Charset.defaultCharset());
         jsonList = lines
                 .map(line-> {
                     try {
@@ -42,23 +45,15 @@ public class Main {
                 .filter(a -> a.get("title").toString().toLowerCase().contains(key.toLowerCase()))
                 .collect(Collectors.toList());
 
-        List<JSONObject> refList = keyList
-                .stream()
-                .sorted(Comparator.comparing(a ->(Integer)a.get("n_citations")))
-                .collect(Collectors.toList());
+        keyList.forEach(a->System.out.println(a.get("title").toString()));
 
-        for(JSONObject a: refList) {
-            refList.forEach(System.out::println);
-        }
-
+        //keyList.stream().forEach(a-> h.put(a.get("title").toString(), refList.addAll(a.get("references"))));
+        //List<JSONObject> refList = keyList
+          //      .stream()
+            //    .sorted(Comparator.comparing(a ->(Integer)a.get("n_citations")))
+              //  .collect(Collectors.toList());
 
 
-
-        // process json file
-        // search for keyword
-        // get cited articles till level n
-        // sort total articles from most cited to least cited
-        // print article info
         long stop = System.currentTimeMillis();
         System.out.println("Total time taken in ms: " + (stop-start));
         Runtime r = Runtime.getRuntime();
