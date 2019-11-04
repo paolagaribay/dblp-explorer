@@ -1,13 +1,16 @@
-import java.io.File;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.JsonFactory;
+
+import org.json.simple.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 
 public class Main {
@@ -17,58 +20,39 @@ public class Main {
             System.exit(1);
         }
         long start = System.currentTimeMillis();
-
-        File f = new File(args[0]);
         String key = args[1];
         int n = Integer.parseInt(args[2]);
+        JSONParser parser = new JSONParser();
+        List<JSONObject> jsonList;
 
-        List<Article> jsonList = new ArrayList<>();
-        List<Article> keyTitles;
-        List<String> refList = new ArrayList<>();
-
-        JsonFactory jf = new JsonFactory();
-        JsonParser parser = jf.createJsonParser(f);
-        JsonToken token = parser.nextToken();
-
-        while (token != JsonToken.END_ARRAY) {
-            String name = parser.getCurrentName();
-            Article a = new Article();
-            if ("id".equals(name)) {
-                token = parser.nextToken();
-                a.setId(parser.getText());
-            }
-            if ("title".equals(name)) {
-                token = parser.nextToken();
-                a.setTitle(parser.getText());
-            }
-            if ("n_citations".equals(name)) {
-                token = parser.nextToken();
-                a.setCitations(Integer.parseInt(parser.getText()));
-            }
-            if ("references".equals(name)) {
-                token = parser.nextToken();
-                List<String> ref = new ArrayList<>();
-                while (parser.nextToken() != JsonToken.END_ARRAY) {
-                    ref.add(parser.getText());
-                }
-                a.setReferences(ref);
-            }
-            if (token == JsonToken.END_OBJECT) {
-                jsonList.add(a);
-            }
-            token = parser.nextToken();
-        }
-        keyTitles = jsonList
-                .stream()
-                .filter(a -> a.getTitle().contains(key))
-                .sorted(Comparator.comparing(Article::getCitations))
+        Stream<String>lines = Files.lines(Paths.get(args[0]), Charset.defaultCharset());
+        jsonList = lines
+                .map(line-> {
+                    try {
+                        return (JSONObject)parser.parse(line);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
                 .collect(Collectors.toList());
 
-        for (Article a: keyTitles) {
-            refList.addAll(a.getReferences());
+        List<JSONObject> keyList = jsonList
+                .stream()
+                .filter(a -> a.get("title").toString().toLowerCase().contains(key.toLowerCase()))
+                .collect(Collectors.toList());
+
+        List<JSONObject> refList = keyList
+                .stream()
+                .sorted(Comparator.comparing(a ->(Integer)a.get("n_citations")))
+                .collect(Collectors.toList());
+
+        for(JSONObject a: refList) {
+            refList.forEach(System.out::println);
         }
-        keyTitles.stream().distinct().collect(Collectors.toList());
-        keyTitles.forEach(System.out::println);
+
+
+
 
         // process json file
         // search for keyword
@@ -76,7 +60,7 @@ public class Main {
         // sort total articles from most cited to least cited
         // print article info
         long stop = System.currentTimeMillis();
-        System.out.println("Total time taken in ms: " + (start-stop));
+        System.out.println("Total time taken in ms: " + (stop-start));
         Runtime r = Runtime.getRuntime();
         r.gc();
         long memory = r.totalMemory()-r.freeMemory();
